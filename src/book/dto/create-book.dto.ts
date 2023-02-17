@@ -1,10 +1,12 @@
-import { IsEnum, IsInt, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { Category } from './category.interface';
 
 export class CreateBookDto {
+  @IsNotEmpty()
   @IsString()
   readonly title: string;
 
+  @IsNotEmpty()
   @IsString()
   readonly description: string;
 
@@ -13,10 +15,10 @@ export class CreateBookDto {
   readonly author: string;
 
   @IsNotEmpty()
-  @IsInt()
+  @IsNumber()
   readonly price: number;
 
   @IsNotEmpty()
-  @IsEnum(Category)
+  @IsEnum(Category, { message: 'Please enter correct category.' })
   readonly category: Category;
 }
