@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Book } from './schema/book.schema';
 import * as mongoose from 'mongoose';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
+import { User } from 'src/auth/schema/user.schema';
 
 @Injectable()
 export class BookService {
@@ -17,12 +22,19 @@ export class BookService {
     return book;
   }
 
-  async create(book: CreateBookDto): Promise<Book> {
-    const res = await this.bookModel.create(book);
+  async create(book: CreateBookDto, user: User): Promise<Book> {
+    const data = Object.assign(book, { user: user._id });
+
+    const res = await this.bookModel.create(data);
     return res;
   }
 
   async findById(id: string): Promise<Book> {
+    const isValidId = mongoose.isValidObjectId(id);
+    if (!isValidId) {
+      throw new BadRequestException('please enter correct id');
+    }
+
     const book = await this.bookModel.findById(id);
 
     if (!book) {
